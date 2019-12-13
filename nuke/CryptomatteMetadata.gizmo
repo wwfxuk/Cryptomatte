@@ -1,0 +1,17 @@
+version 7.0 v1
+ModifyMetaData {
+ metadata {
+  {set exr/cryptomatte/f834d0a/conversion uint32_to_float32}
+  {set exr/cryptomatte/f834d0a/hash MurmurHash3_32}
+  {set exr/cryptomatte/f834d0a/name crypto_object_crypto_object}
+  {set exr/cryptomatte/28322e9/conversion uint32_to_float32}
+  {set exr/cryptomatte/28322e9/hash MurmurHash3_32}
+  {set exr/cryptomatte/28322e9/name crypto_asset_crypto_asset}
+  {set exr/cryptomatte/bda530a/conversion uint32_to_float32}
+  {set exr/cryptomatte/bda530a/hash MurmurHash3_32}
+  {set exr/cryptomatte/bda530a/name crypto_material_crypto_material}
+ }
+ name CryptomatteMetadata
+ tile_color 0xff00ff
+ selected true
+}

@@ -34,6 +34,9 @@ def setup_cryptomatte_ui():
         automatte_menu.addCommand("Decryptomatte All", "import cryptomatte_utilities as cu; cu.decryptomatte_all();")
         automatte_menu.addCommand("Decryptomatte Selection", "import cryptomatte_utilities as cu; cu.decryptomatte_selected();")
         automatte_menu.addCommand("Encryptomatte", "import cryptomatte_utilities as cu; cu.encryptomatte_create_gizmo();")
+        # Patched in our own commands/actions
+        automatte_menu.addSeparator().action().setText('WWFX')
+        automatte_menu.addCommand("CryptomatteMetadata", "nuke.createNode('CryptomatteMetadata')")
 
 def setup_cryptomatte():
     nuke.addKnobChanged(lambda: cryptomatte_knob_changed_event(
