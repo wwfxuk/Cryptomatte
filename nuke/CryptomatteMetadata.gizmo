@@ -11,7 +11,7 @@ ModifyMetaData {
   {set exr/cryptomatte/bda530a/hash MurmurHash3_32}
   {set exr/cryptomatte/bda530a/name crypto_material_crypto_material}
  }
- name CryptomatteMetadata
+ name CryptomatteMetadata1
  tile_color 0xff00ff
  selected true
 }

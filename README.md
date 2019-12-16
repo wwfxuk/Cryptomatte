@@ -62,6 +62,45 @@ Decoders:
 
 ## Release Notes
 
+### [1.2.0+wwfx.1.2.0] - 2019-12-16
+
+Patched in Arnold style AOV layer names to cryptomattes parser, effectively
+doing the job of `CryptomatteMetadata` for any `CryptomatteWWFX*` named nodes.
+
+#### Added
+
+- `CryptoMatteInfo.setup_wwfx_arnold_layers()` called during `__init__`
+- `CryptomatteWWFX` menu item which calls new
+  `cryptomatte_utilities.wwfx_cryptomatte_create_gizmo()`
+
+#### Fixed
+
+- Missing numbering for `CryptomatteMetadata` nodes.
+- Missing WWFX change logs of previous versions.
+
+
+### [1.2.0+wwfx.1.1.1] - 2019-12-13
+
+Refactored to use `nuke.this*()` fallback and fixed callback method names.
+
+#### Fixed
+
+- Missing nuke node/knob causing "ValueError: A PythonObject is not attached
+  to a node".
+- Actually branch from Psyop 1.2.0
+
+
+### [1.2.0+wwfx.1.1.0] - 2019-12-13
+
+New `CryptomatteMetadata` node to fix Katana render outputs, using WWFX
+GitHub fork.
+
+#### Added
+
+- `CryptomatteMetadata` gizmo.
+
+------
+
 1.2.0:
 
 This is a major update to both the Nuke plugins and Fusion plugins, and a minor update to the Cryptomatte specification. 
