@@ -147,6 +147,21 @@ class CryptomatteInfo(object):
 
         default_selection = None
 
+        for layer_name, channel_matches in self.iter_arnold_crypto_layers():
+            prefix = 'exr/cryptomatte'
+            layer_info = {
+                # 'name': layer_name,
+                'name': '{0}_{0}'.format(layer_name),
+                'conversion': 'uint32_to_float32',
+                'hash': 'MurmurHash3_32',
+                'md_prefix': prefix,
+            }
+            crypto_id = layer_hash(layer_name)
+            for key, value in sorted(layer_info.items()):
+                metadata_key = '/'.join(map(str, [prefix, crypto_id, key]))
+                exr_metadata_dict[metadata_key] = value
+            # self.cryptomattes.setdefault(crypto_id, {}).update(layer_info)
+
         for key, value in exr_metadata_dict.iteritems():
             if key == "input/filename":
                 self.filename = value
@@ -177,6 +192,28 @@ class CryptomatteInfo(object):
                 valid_selection = self.set_selection(selection_name)
                 if not valid_selection and not self.nuke_node.knob("cryptoLayerLock").getValue():
                     self.selection = default_selection
+
+    def iter_arnold_crypto_layers(self, node=None):
+        """
+
+        Args:
+            node (nuke.Node): Custom node to setup layers/channels from.
+        """
+        import collections
+        import re
+
+        node = node or getattr(self, 'nuke_node', nuke.thisNode())
+        regex = re.compile(
+            '(?P<layer>crypto_(?P<name>material|object|asset))_(?P=layer)'
+        )
+        crypto_matches = collections.defaultdict(list)
+        for match_result in map(regex.match, sorted(node.channels())):
+            if match_result is not None:
+                layer_name = match_result.group('layer')
+                crypto_matches[layer_name].append(match_result)
+
+        for layer_name, channel_matches in sorted(crypto_matches.items()):
+            yield layer_name, channel_matches
 
     def is_valid(self):
         """Checks that the selection is valid."""
