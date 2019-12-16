@@ -171,26 +171,14 @@ class CryptomatteInfo(object):
             self.cryptomattes[metadata_id]["channels"] = channels
 
         # WWFX: Parse our own AOV layers/names from Katana ExrCombine
-        for layer_name, channel_matches in self.iter_arnold_crypto_layers():
-            prefix = 'exr/cryptomatte'
+        for layer_name, channel_paths in self.iter_arnold_crypto_layers():
             crypto_id = layer_hash(layer_name)
-            name = '{0}_{0}'.format(layer_name)  # layer_name
-            channels = sorted(set(match.group() for match in channel_matches))
-            layer_info = {
-                'name': name,
-                'conversion': 'uint32_to_float32',
-                'hash': 'MurmurHash3_32',
-                'md_prefix': prefix + '/',
-            }
-            # # Update node's metadata
-            # for key, value in sorted(layer_info.items()):
-            #     metadata_key = '/'.join(map(str, [prefix, crypto_id, key]))
-            #     exr_metadata_dict[metadata_key] = value
 
             # Update self.cryptomattes, setup channels
-            crypto_info = self.cryptomattes.setdefault(crypto_id, {})
-            crypto_info.update(layer_info)
-            crypto_info['channels'] = channels
+            self.cryptomattes.setdefault(crypto_id, {}).update(
+                name=layer_name,
+                channels=channel_paths,
+            )
 
             # Set default_selection if not already set
             if default_selection is None:
@@ -218,14 +206,14 @@ class CryptomatteInfo(object):
             '(?P<layer>crypto_(?P<name>material|object|asset))'
             '_(?P=layer)[^\.]+'
         )
-        crypto_matches = collections.defaultdict(list)
+        crypto_matches = collections.defaultdict(set)
         for match_result in map(regex.match, sorted(node.channels())):
             if match_result is not None:
                 layer_name = match_result.group('layer')
-                crypto_matches[layer_name].append(match_result)
+                crypto_matches[layer_name].add(match_result.group())
 
-        for layer_name, channel_matches in sorted(crypto_matches.items()):
-            yield layer_name, channel_matches
+        for layer_name, channels_set in sorted(crypto_matches.items()):
+            yield layer_name, sorted(channels_set)
 
     def is_valid(self):
         """Checks that the selection is valid."""
