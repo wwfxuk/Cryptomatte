@@ -415,7 +415,7 @@ def cryptomatte_create_gizmo():
 
 
 def wwfx_cryptomatte_create_gizmo():
-    """
+    """Create Cryptomatte gizmo with WWFX in name for Arnold layer parsing.
 
     Returns:
         nuke.Node: Cryptomatte node with WWFX in name.
