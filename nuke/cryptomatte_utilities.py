@@ -31,12 +31,12 @@ def setup_cryptomatte_ui():
         toolbar = nuke.menu("Nodes")
         automatte_menu = toolbar.addMenu("Cryptomatte", "cryptomatte_logo.png",index=-1)
         automatte_menu.addCommand("Cryptomatte", "import cryptomatte_utilities as cu; cu.cryptomatte_create_gizmo();")
-        automatte_menu.addCommand("CryptomatteWWFX", "import cryptomatte_utilities as cu; cu.wwfx_cryptomatte_create_gizmo();")
         automatte_menu.addCommand("Decryptomatte All", "import cryptomatte_utilities as cu; cu.decryptomatte_all();")
         automatte_menu.addCommand("Decryptomatte Selection", "import cryptomatte_utilities as cu; cu.decryptomatte_selected();")
         automatte_menu.addCommand("Encryptomatte", "import cryptomatte_utilities as cu; cu.encryptomatte_create_gizmo();")
         # Patched in our own commands/actions
         automatte_menu.addSeparator().action().setText('WWFX')
+        automatte_menu.addCommand("CryptomatteWWFX", "import cryptomatte_utilities as cu; cu.wwfx_cryptomatte_create_gizmo();")
         automatte_menu.addCommand("CryptomatteMetadata", "nuke.createNode('CryptomatteMetadata')")
 
 def setup_cryptomatte():
@@ -183,7 +183,6 @@ class CryptomatteInfo(object):
                 valid_selection = self.set_selection(selection_name)
                 if not valid_selection and not self.nuke_node.knob("cryptoLayerLock").getValue():
                     self.selection = default_selection
-
 
     def is_valid(self):
         """Checks that the selection is valid."""
