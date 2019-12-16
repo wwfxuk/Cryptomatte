@@ -356,7 +356,7 @@ class CryptomatteInfo(object):
         return errors, collisions
 
     def setup_wwfx_arnold_layers(self):
-        """Parse and update Arnold style `crypto_*` layers if WWFX in name.
+        """Parse and update Arnold style ``crypto_*`` layers if WWFX in name.
 
         Returns:
             str: Crypto ID from Arnold layers to use as default selection ID.
