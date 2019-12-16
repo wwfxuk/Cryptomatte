@@ -31,6 +31,7 @@ def setup_cryptomatte_ui():
         toolbar = nuke.menu("Nodes")
         automatte_menu = toolbar.addMenu("Cryptomatte", "cryptomatte_logo.png",index=-1)
         automatte_menu.addCommand("Cryptomatte", "import cryptomatte_utilities as cu; cu.cryptomatte_create_gizmo();")
+        automatte_menu.addCommand("CryptomatteWWFX", "import cryptomatte_utilities as cu; cu.wwfx_cryptomatte_create_gizmo();")
         automatte_menu.addCommand("Decryptomatte All", "import cryptomatte_utilities as cu; cu.decryptomatte_all();")
         automatte_menu.addCommand("Decryptomatte Selection", "import cryptomatte_utilities as cu; cu.decryptomatte_selected();")
         automatte_menu.addCommand("Encryptomatte", "import cryptomatte_utilities as cu; cu.encryptomatte_create_gizmo();")
@@ -170,19 +171,10 @@ class CryptomatteInfo(object):
             channels = self._identify_channels(name)
             self.cryptomattes[metadata_id]["channels"] = channels
 
-        # WWFX: Parse our own AOV layers/names from Katana ExrCombine
-        for layer_name, channel_paths in self.iter_arnold_crypto_layers():
-            crypto_id = layer_hash(layer_name)
-
-            # Update self.cryptomattes, setup channels
-            self.cryptomattes.setdefault(crypto_id, {}).update(
-                name=layer_name,
-                channels=channel_paths,
-            )
-
-            # Set default_selection if not already set
-            if default_selection is None:
-                default_selection = crypto_id
+        # WWFX Arnold layer names to cryptomattes
+        default_selection = self.setup_wwfx_arnold_layers(
+            default_id=default_selection
+        )
 
         self.selection = default_selection
         if self.nuke_node.Class() in ["Cryptomatte", "Encryptomatte"]:
@@ -192,28 +184,6 @@ class CryptomatteInfo(object):
                 if not valid_selection and not self.nuke_node.knob("cryptoLayerLock").getValue():
                     self.selection = default_selection
 
-    def iter_arnold_crypto_layers(self, node=None):
-        """
-
-        Args:
-            node (nuke.Node): Custom node to setup layers/channels from.
-        """
-        import collections
-        import re
-
-        node = node or getattr(self, 'nuke_node', nuke.thisNode())
-        regex = re.compile(
-            '(?P<layer>crypto_(?P<name>material|object|asset))'
-            '_(?P=layer)[^\.]+'
-        )
-        crypto_matches = collections.defaultdict(set)
-        for match_result in map(regex.match, sorted(node.channels())):
-            if match_result is not None:
-                layer_name = match_result.group('layer')
-                crypto_matches[layer_name].add(match_result.group())
-
-        for layer_name, channels_set in sorted(crypto_matches.items()):
-            yield layer_name, sorted(channels_set)
 
     def is_valid(self):
         """Checks that the selection is valid."""
@@ -387,6 +357,38 @@ class CryptomatteInfo(object):
 
         return errors, collisions
 
+    def setup_wwfx_arnold_layers(self, default_id=None):
+        import collections
+        import re
+
+        node = self.nuke_node or nuke.thisNode()
+        if 'WWFX' in node.name():
+            regex = re.compile(
+                r'(?P<layer>crypto_(?P<name>material|object|asset))'
+                r'_(?P=layer)[^\.]+'
+            )
+            crypto_matches = collections.defaultdict(set)
+
+            for match_result in map(regex.match, sorted(node.channels())):
+                if match_result is not None:
+                    layer_name = match_result.group('layer')
+                    crypto_matches[layer_name].add(match_result.group())
+
+            for layer_name, channels_set in sorted(crypto_matches.items()):
+                crypto_id = layer_hash(layer_name)
+
+                # Update self.cryptomattes, setup channels
+                self.cryptomattes.setdefault(crypto_id, {}).update(
+                    name=layer_name,
+                    channels=sorted(channels_set),
+                )
+
+                # Set default_id if not already set
+                if default_id is None:
+                    default_id = crypto_id
+
+        return default_id
+
 
 def print_hash_info(name):
     hash_32 = mmh3.hash(name)
@@ -406,6 +408,10 @@ def print_hash_info(name):
 
 def cryptomatte_create_gizmo():
     return nuke.createNode("Cryptomatte")
+
+
+def wwfx_cryptomatte_create_gizmo():
+    return nuke.createNode("Cryptomatte", "name CryptomatteWWFX1")
 
 
 def encryptomatte_create_gizmo():
