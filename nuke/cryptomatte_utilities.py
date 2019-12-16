@@ -147,21 +147,6 @@ class CryptomatteInfo(object):
 
         default_selection = None
 
-        for layer_name, channel_matches in self.iter_arnold_crypto_layers():
-            prefix = 'exr/cryptomatte'
-            layer_info = {
-                # 'name': layer_name,
-                'name': '{0}_{0}'.format(layer_name),
-                'conversion': 'uint32_to_float32',
-                'hash': 'MurmurHash3_32',
-                'md_prefix': prefix,
-            }
-            crypto_id = layer_hash(layer_name)
-            for key, value in sorted(layer_info.items()):
-                metadata_key = '/'.join(map(str, [prefix, crypto_id, key]))
-                exr_metadata_dict[metadata_key] = value
-            # self.cryptomattes.setdefault(crypto_id, {}).update(layer_info)
-
         for key, value in exr_metadata_dict.iteritems():
             if key == "input/filename":
                 self.filename = value
@@ -185,6 +170,32 @@ class CryptomatteInfo(object):
             channels = self._identify_channels(name)
             self.cryptomattes[metadata_id]["channels"] = channels
 
+        # WWFX: Parse our own AOV layers/names from Katana ExrCombine
+        for layer_name, channel_matches in self.iter_arnold_crypto_layers():
+            prefix = 'exr/cryptomatte'
+            crypto_id = layer_hash(layer_name)
+            name = '{0}_{0}'.format(layer_name)  # layer_name
+            channels = sorted(set(match.group() for match in channel_matches))
+            layer_info = {
+                'name': name,
+                'conversion': 'uint32_to_float32',
+                'hash': 'MurmurHash3_32',
+                'md_prefix': prefix + '/',
+            }
+            # # Update node's metadata
+            # for key, value in sorted(layer_info.items()):
+            #     metadata_key = '/'.join(map(str, [prefix, crypto_id, key]))
+            #     exr_metadata_dict[metadata_key] = value
+
+            # Update self.cryptomattes, setup channels
+            crypto_info = self.cryptomattes.setdefault(crypto_id, {})
+            crypto_info.update(layer_info)
+            crypto_info['channels'] = channels
+
+            # Set default_selection if not already set
+            if default_selection is None:
+                default_selection = crypto_id
+
         self.selection = default_selection
         if self.nuke_node.Class() in ["Cryptomatte", "Encryptomatte"]:
             selection_name = node_in.knob("cryptoLayer").getValue()
@@ -204,7 +215,8 @@ class CryptomatteInfo(object):
 
         node = node or getattr(self, 'nuke_node', nuke.thisNode())
         regex = re.compile(
-            '(?P<layer>crypto_(?P<name>material|object|asset))_(?P=layer)'
+            '(?P<layer>crypto_(?P<name>material|object|asset))'
+            '_(?P=layer)[^\.]+'
         )
         crypto_matches = collections.defaultdict(list)
         for match_result in map(regex.match, sorted(node.channels())):
