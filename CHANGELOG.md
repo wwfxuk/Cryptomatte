@@ -1,3 +1,24 @@
+### [1.2.1+wwfx.1.0.1] - 2020-08-14
+
+[1.2.1+wwfx.1.0.1]: https://github.com/wwfxuk/Cryptomatte/compare/1.2.1+wwfx.1.0.0...1.2.1+wwfx.1.0.1
+
+### Fixed
+
+- Moved WWFX change logs into `CHANGELOG.md`
+
+
+### [1.2.1+wwfx.1.0.0] - 2020-08-14
+
+[1.2.1+wwfx.1.0.0]: https://github.com/wwfxuk/Cryptomatte/compare/1.2.1...1.2.1+wwfx.1.0.0
+
+Merged in official [1.2.1](https://github.com/Psyop/Cryptomatte/compare/1.2.0...1.2.1), 
+keeping these previous changes from:
+
+- https://github.com/wwfxuk/Cryptomatte/releases/tag/1.2.0+wwfx.1.1.0
+- https://github.com/wwfxuk/Cryptomatte/releases/tag/1.2.0+wwfx.1.1.1
+- https://github.com/wwfxuk/Cryptomatte/releases/tag/1.2.0+wwfx.1.2.0
+
+
 ### 1.2.1:
 
 A reorganization of this repo, and a minor update to the Nuke plugins.
@@ -13,6 +34,49 @@ Nuke:
 * Do not allow keying IDs with zero coverage
 * Fixed some test issues in Nuke 11.3
 * Cleaner decryptomatte results, with maximum of 3 nodes in sequence, no dots, and better naming
+
+### [1.2.0+wwfx.1.2.0] - 2019-12-16
+
+[1.2.0+wwfx.1.2.0]: https://github.com/wwfxuk/Cryptomatte/compare/1.2.0+wwfx.1.1.1...1.2.0+wwfx.1.2.0
+
+Patched in Arnold style AOV layer names to cryptomattes parser, effectively
+doing the job of `CryptomatteMetadata` for any `CryptomatteWWFX*` named nodes.
+
+#### Added
+
+- `CryptoMatteInfo.setup_wwfx_arnold_layers()` called during `__init__`
+- `CryptomatteWWFX` menu item which calls new
+  `cryptomatte_utilities.wwfx_cryptomatte_create_gizmo()`
+
+#### Fixed
+
+- Missing numbering for `CryptomatteMetadata` nodes.
+- Missing WWFX change logs of previous versions.
+
+
+### [1.2.0+wwfx.1.1.1] - 2019-12-13
+
+[1.2.0+wwfx.1.1.1]: https://github.com/wwfxuk/Cryptomatte/compare/1.2.0+wwfx.1.1.0...1.2.0+wwfx.1.1.1
+
+Refactored to use `nuke.this*()` fallback and fixed callback method names.
+
+#### Fixed
+
+- Missing nuke node/knob causing "ValueError: A PythonObject is not attached
+  to a node".
+- Actually branch from Psyop 1.2.0
+
+
+### [1.2.0+wwfx.1.1.0] - 2019-12-13
+
+[1.2.0+wwfx.1.1.0]: https://github.com/wwfxuk/Cryptomatte/compare/1.2.0...1.2.0+wwfx.1.1.0
+
+New `CryptomatteMetadata` node to fix Katana render outputs, using WWFX
+GitHub fork.
+
+#### Added
+
+- `CryptomatteMetadata` gizmo.
 
 ### 1.2.0:
 
